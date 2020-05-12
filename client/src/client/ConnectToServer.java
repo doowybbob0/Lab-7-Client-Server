@@ -306,7 +306,7 @@ public class ConnectToServer {
 	                        shipToServer.writeObject(bufferedCommand);
 	                        shipToServer.flush();	    
 	                        System.out.println("[AUTH] Enter new password");
-	                        shipToServer.writeObject(Auth.new_password(userCommandReader.nextLine()));
+	                        shipToServer.writeObject(userCommandReader.nextLine());
 	                        shipToServer.flush();
 	                        System.out.println("[AUTH] Your password was updated");
 	                        break;

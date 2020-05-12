@@ -28,8 +28,8 @@ public class Auth {
                         while (passwordStage) {                        	
                             System.out.println("[AUTH] Enter your password:");
                             String user_password = authScanner.nextLine();                            
-                            String encrypted_user_password = ConnectToServer.encrypt_data(user_password);
-                            authOut.writeUTF(encrypted_user_password);                            
+                            //String encrypted_user_password = ConnectToServer.encrypt_data(user_password);
+                            authOut.writeUTF(user_password);                            
                             int serverAuthAnswer = authIn.read();
                             if (serverAuthAnswer == 1) {
                             	passwordStage=false;
