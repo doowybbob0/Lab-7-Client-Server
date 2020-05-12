@@ -1,8 +1,10 @@
 package commands_server;
+import java.util.concurrent.Callable;
+
 import server.CCollection;
 
-public class C_show {
-	public String show() {
+public class C_show implements Callable {
+	public String call() {
 		StringBuilder reportString = new StringBuilder();
         int a = 1;
         long key = 0;

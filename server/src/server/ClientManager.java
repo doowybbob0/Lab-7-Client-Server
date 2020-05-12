@@ -14,7 +14,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 import java.text.SimpleDateFormat;
 import java.util.Date; 
@@ -22,10 +25,11 @@ import java.util.Date;
 public class ClientManager  implements Runnable  {
 
     private static Socket clientDialog;
-    static  int available_resources_pool = Runtime.getRuntime().availableProcessors();
+    //static  int available_resources_pool = Runtime.getRuntime().availableProcessors();
     public static Scanner commandReader= new Scanner(System.in);
     String[] finalServerCommand;
     String currentUserName;
+    static ExecutorService executeIt = Executors.newFixedThreadPool(8);
     
     public ClientManager(Socket client) { ClientManager.clientDialog = client; }
     
@@ -57,7 +61,7 @@ public class ClientManager  implements Runnable  {
             	if (isAuthorized) {
             		user_id = Table_Users.getIDByName(currentUserName);            		
             		
-            		ForkJoinPool fjPool = new ForkJoinPool(available_resources_pool);
+            		//ForkJoinPool fjPool = new ForkJoinPool(available_resources_pool);
             		
 		            com = inn.readObject(); 		           	
 		            
@@ -69,11 +73,16 @@ public class ClientManager  implements Runnable  {
 	                switch (k) {
 	                    
 	                        case "show":
-	                            String show = new C_show().show();
+	                        	String final_show="Nothing here";
+	                        	Future <String> show = executeIt.submit(new C_show());
+	                        	try{final_show = show.get();}catch(Exception e) {e.printStackTrace();}
+	                        	//System.out.println(final_show);
+	                        	//String show = new C_show().show();
 	                            //outt.writeObject(show);
 	                            //String s1 = new Show().show();
 	                            //Object show = new Show().show();
-	                            outt.writeObject(fjPool.invoke(new ForkTaskPool(0,show)));
+	                            //outt.writeObject(fjPool.invoke(new ForkTaskPool(0,show)));
+	                        	outt.writeObject(final_show);
 	                            break;	                            	                        
 	                        
 	                        case "print_field_ascending_health":
@@ -206,6 +215,7 @@ public class ClientManager  implements Runnable  {
 	                            break;
 	                        case "change_password":
 	                            String new_password= (String) inn.readObject();
+	                            new_password = Table_Users.encrypt_data(new_password);
 	                            Table_Users.change_password(user_id, new_password);	                            	                            
 	                            break;
 	                }            
@@ -254,30 +264,32 @@ public class ClientManager  implements Runnable  {
     
     
     
-    static class ForkTaskPool extends RecursiveTask<StringBuilder> {
-        String ftpString;
-        int counter;
-
-        public ForkTaskPool(int i,String formattedBuilder){
-            this.counter=i;
-            this.ftpString=formattedBuilder;
-        }
-
-        @Override
-        protected StringBuilder compute() {
-            int i = -1;
-            String spl = "!";
-            String string = ftpString;
-            StringBuilder compute_builder = new StringBuilder();
-            String[] s = string.split(spl);            
-            while (i!=s.length-1){
-                i++;
-                while (s[i]==null){i++;}
-                String element = s[i];
-                compute_builder.append(element+System.lineSeparator());
-                ForkTaskPool f2 = new ForkTaskPool(i,ftpString); }            
-            compute_builder.append(System.lineSeparator());
-                return compute_builder;
-        }
-    }
+    
+    
+//    static class ForkTaskPool extends RecursiveTask<StringBuilder> {
+//        String ftpString;
+//        int counter;
+//
+//        public ForkTaskPool(int i,String formattedBuilder){
+//            this.counter=i;
+//            this.ftpString=formattedBuilder;
+//        }
+//
+//        @Override
+//        protected StringBuilder compute() {
+//            int i = -1;
+//            String spl = "!";
+//            String string = ftpString;
+//            StringBuilder compute_builder = new StringBuilder();
+//            String[] s = string.split(spl);            
+//            while (i!=s.length-1){
+//                i++;
+//                while (s[i]==null){i++;}
+//                String element = s[i];
+//                compute_builder.append(element+System.lineSeparator());
+//                ForkTaskPool f2 = new ForkTaskPool(i,ftpString); }            
+//            compute_builder.append(System.lineSeparator());
+//                return compute_builder;
+//        }
+//    }
 }

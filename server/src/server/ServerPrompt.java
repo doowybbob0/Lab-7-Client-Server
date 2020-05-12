@@ -30,7 +30,7 @@ public class ServerPrompt implements Runnable {
                     		break;
                     	case "show":
                     		System.out.println("Receiving data...");
-                    		System.out.println(new C_show().show());
+                    		System.out.println(new C_show().call());
                     		break;
                     	case "new_user":
 	                		System.out.print("Enter new user's login:");

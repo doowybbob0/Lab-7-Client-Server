@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.google.gson.*;
+
+//import server.ClientManager.ForkTaskPool;
+
 import java.net.SocketException;
 import java.io.*;
 import java.util.*;
@@ -21,7 +26,10 @@ import java.util.*;
  */
 public class Main {
 	
-	static ExecutorService executeIt = Executors.newFixedThreadPool(8);
+	static ExecutorService executeIt = Executors.newFixedThreadPool(2);
+	ForkJoinPool clientPool=ForkJoinPool.commonPool();
+	static  int available_resources_pool = Runtime.getRuntime().availableProcessors();
+	
 	
     /**
      * Asks user to fill in desired file path via environment variable
@@ -71,6 +79,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException,SocketException {
     	System.out.println("Starting server");
+    	ForkJoinPool fjPool = new ForkJoinPool(available_resources_pool);
     	DBFormattingTool.start();
     	    try {
     		ServerSocket server = new ServerSocket(28553);
@@ -86,16 +95,17 @@ public class Main {
             	  
                 	Thread.sleep(500);
                 	Socket client = server.accept();// Client's waiting for connection                  
-                	System.out.println("New connection established");                                                       
-                	executeIt.execute(new ClientManager(client));
+                	System.out.println("New connection established");  
+                	fjPool.execute(new ClientManager(client));
+                	//executeIt.execute(new ClientManager(client));
                 	System.out.println("New Client profile created");
                   
                 	Thread.sleep(300);
               }
-              executeIt.shutdown();
+              //executeIt.shutdown();
             }
             
           // Closing pool
       } catch (IOException | InterruptedException  e) {System.out.println("Failed to start server.");}    	    
-    }
+    }      
 }

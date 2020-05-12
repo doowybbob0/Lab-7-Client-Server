@@ -76,7 +76,7 @@ public class C_execute_script  {
                         case "show":
                         	scriptString.append("["+java.util.Date.from(Instant.now())+"]:"+"Executing  show");
                         	scriptString.append(System.lineSeparator());
-                            Object show = new C_show().show();
+                            Object show = new C_show().call();
                             scriptString.append(show);
                             scriptString.append(System.lineSeparator());
                             scriptString.append("Done");

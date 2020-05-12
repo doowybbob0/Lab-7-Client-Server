@@ -25,6 +25,7 @@ public class Auth {
             
                         
             String user_password;
+            String user_raw_password;
             boolean isCorrectLogin = false;
             int f=1;
             int n = 0;
@@ -43,7 +44,8 @@ public class Auth {
 	                        serverOutput.write(1);
 	                        
 	                        while (true) {	                        	
-	                        	user_password = userInput.readUTF();
+	                        	user_raw_password = userInput.readUTF();
+	                        	user_password=Table_Users.encrypt_data(user_raw_password);
 	                        	if (user_password.equals(CurrentUsers.mapped_users.get(user_id).getParol())) {
 	                                serverOutput.write(1); 
 	                                Long current_user_id = Table_Users.getIDByName(user_login);
